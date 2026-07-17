@@ -1,0 +1,95 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.installed.cfg
+*.egg
+.venv/
+venv/
+ENV/
+env/
+build/
+dist/
+
+# Node / JS
+node_modules/
+dist/
+.vite/
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.cache/
+
+# Docker
+docker-compose.override.yml
+
+# Environment
+.env
+.env.*
+.env.local
+.env.*.local
+!.env.example
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+db.desktop
+*.directory
+
+# SQLite / Database
+*.db
+*.sqlite
+*.sqlite3
+infra/db/traces/*.db
+infra/db/traces/*.sqlite
+
+# Logs
+*.log
+logs/
+
+# Loop Engineer / Internal
+.loop_engineer/
+.loop_engineer_archive/
+
+# Harness durable layer
+harness.db
+harness.db-wal
+harness.db-shm
+scripts/bin/harness-cli
+scripts/bin/harness-cli.exe
+
+# Project specific
+tmp/
+.pids/
+
+# Testing & Linting
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+coverage/
+.coverage
+htmlcov/
+playwright-report/
+test-results/
+blob-report/
+
+# Secrets & Credentials
+*.pem
+*.key
+*.cert
+credentials.json
+secret.json
+client_secret.json
+packages/shared-types/src/api

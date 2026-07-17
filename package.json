@@ -1,0 +1,14 @@
+{
+  "name": "my-hackathon-template",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "generate:api": "python3 export_openapi.py backend && npm run generate --workspace=@app/shared-types"
+  },
+  "devDependencies": {
+    "chokidar-cli": "^3.0.0"
+  }
+}
