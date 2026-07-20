@@ -10,7 +10,7 @@ COLOR_SUCCESS := \033[32m
 COLOR_WARN    := \033[33m
 COLOR_ERROR   := \033[31m
 
-.PHONY: help setup dev dev-backend dev-frontend stop migrate migrate-new seed test test-backend lint clean build docker-compose-up wait-db generate-client watch-client
+.PHONY: help setup dev dev-backend dev-frontend stop migrate migrate-new seed db-status db-reset db-reset-hard test test-backend lint check-secrets clean build docker-compose-up wait-db generate-client watch-client
 
 help: ## Show all targets with descriptions
 	@echo -e "$(COLOR_WARN)Note for Windows Users: Please run these 'make' commands in Git Bash or WSL.$(COLOR_RESET)"
@@ -75,9 +75,20 @@ migrate-new: ## Run alembic revision --autogenerate with message arg (usage: mak
 	@echo -e "$(COLOR_INFO)Generating new alembic migration: $(m)...$(COLOR_RESET)"
 	cd services/backend && source venv/bin/activate && alembic revision --autogenerate -m "$(m)"
 
-seed: migrate ## Run database seeder script
+seed: ## Migrate then load every seed stage
 	@echo -e "$(COLOR_INFO)Seeding the database...$(COLOR_RESET)"
-	cd services/backend && source venv/bin/activate && python -m scripts.seed
+	cd services/backend && source venv/bin/activate && python -m scripts.db seed
+
+db-status: ## Show row counts per table (which state is the DB in?)
+	cd services/backend && source venv/bin/activate && python -m scripts.db status
+
+db-reset: ## Remove seeded data only; hand-made rows survive
+	@echo -e "$(COLOR_INFO)Resetting seeded data...$(COLOR_RESET)"
+	cd services/backend && source venv/bin/activate && python -m scripts.db reset
+
+db-reset-hard: ## DANGER: drop + rebuild the whole schema on the SHARED dev DB
+	@echo -e "$(COLOR_ERROR)Hard reset drops every table — the DB is shared with the team!$(COLOR_RESET)"
+	cd services/backend && source venv/bin/activate && python -m scripts.db reset --hard
 
 test: test-backend ## Run all tests (pytest for backends, npm test for frontends)
 	@echo -e "$(COLOR_INFO)Running frontend tests...$(COLOR_RESET)"
@@ -87,7 +98,11 @@ test-backend: ## Run Backend service tests
 	@echo -e "$(COLOR_INFO)Running Backend service tests...$(COLOR_RESET)"
 	cd services/backend && source venv/bin/activate && pytest
 
-lint: ## Run linting (ruff for python, oxlint for frontend)
+check-secrets: ## Scan tracked files for credentials that look real
+	@echo -e "$(COLOR_INFO)Scanning for committed secrets...$(COLOR_RESET)"
+	python scripts/check_secrets.py
+
+lint: check-secrets ## Run linting (ruff for python, oxlint for frontend)
 	@echo -e "$(COLOR_INFO)Linting Python services with Ruff...$(COLOR_RESET)"
 	./services/backend/venv/bin/ruff check services/backend
 	@echo -e "$(COLOR_INFO)Linting Frontend apps with Oxlint...$(COLOR_RESET)"

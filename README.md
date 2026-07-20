@@ -1,140 +1,133 @@
+<div align="center">
+
 # My Hackathon Template 🚀
 
-A full-stack, "Plug and Play" starter kit designed for Hackathons, MVP building, and personal projects. Optimized for speed, reliability, and easy deployment via Dokploy using a Modular Monolith architecture.
+**A full-stack, "Plug and Play" starter kit for Hackathons, MVPs, and rapid prototyping.**
 
-## 🤖 AI ONBOARDING (READ FIRST)
-> Dành cho tất cả thành viên khi mới clone dự án về máy:
-Để tự động thiết lập môi trường cá nhân và bắt đầu Sprint 0, hãy copy câu lệnh dưới đây và chat với AI Coding Agent của bạn:
-`"Hãy bắt đầu Sprint 0"`
+[![Python](https://img.shields.io/badge/Python-3.12-3776ab?logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=black)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6?logo=typescript&logoColor=white)](https://typescriptlang.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169e1?logo=postgresql&logoColor=white)](https://postgresql.org)
+[![License](https://img.shields.io/badge/License-MIT-22c55e)](LICENSE)
 
----
-## ⚠️ Hackathon Template Disclosure
+[Architecture](docs/ARCHITECTURE.md) · [Dokploy Setup](docs/DOKPLOY_STAGING_SETUP.md)
 
-**Attention Judges / Reviewers:**
-This repository uses our team's standard pre-built boilerplate (`my-hackathon-template`). To comply with hackathon rules regarding pre-existing code, please note the following:
-
-- **Pre-built Boilerplate:** The authentication flow (JWT + Passlib), basic database routing (FastAPI + SQLAlchemy base configs), and foundational frontend setup (Vite + React + Tailwind setup) are part of this template.
-- **Hackathon Code:** All specific business logic, AI agent workflows, feature-specific API endpoints, and new frontend components/pages were built entirely during the hackathon. 
-
-*We commit to maintaining a clear git history during the event so judges can easily verify the code written during the hackathon period.*
+</div>
 
 ---
 
-## 🏗 Architecture Overview
+This template uses a Modular Monolith architecture to simplify development and deployment while retaining the ability to scale. It eliminates the boilerplate of setting up authentication, databases, routing, and deployment pipelines so you can focus strictly on business logic during a hackathon.
 
-This template uses a Modular Monolith structure to simplify development and deployment while retaining the ability to scale.
+## 🎯 Pain Points & Solutions
 
-- **Frontend (`apps/`)**:
-  - `apps/web`: Main frontend application (Vite + React + Tailwind + shadcn/ui). Includes routing for Landing Page, Workspace Dashboard, and Admin Dashboard.
-- **Backend (`services/`)**:
-  - `services/backend`: Main backend API (FastAPI + SQLAlchemy + PostgreSQL). Includes Rate Limiting (SlowAPI), robust Auth (JWT + Passlib), and integrated AI capabilities (Agno, RAG, OpenAI/Anthropic/Gemini).
-- **Shared (`packages/`)**:
-  - `packages/shared-types`: Shared TypeScript definitions between frontend and backend.
+| Vấn đề khi setup dự án mới | Giải pháp từ Template |
+|---|---|
+| Tốn hàng giờ cấu hình Auth, DB, CORS | **Sẵn sàng 100%:** JWT Auth, FastAPI, SQLAlchemy, Alembic đã được wire sẵn. |
+| Code Frontend và Backend bị lệch type | Sử dụng `openapi-ts` để tự động gen TypeScript SDK. Đảm bảo **End-to-End Type Safety**. |
+| Quên khóa API trên public repo | Tích hợp sẵn `scripts/check_secrets.py` chạy tự động khi `make lint`. |
+| Conflict Database khi dev team lớn | Quy trình quản lý DB Migration rõ ràng qua `TEAM_WORKFLOW.md`. |
+| Deploy cực khổ, cài cắm Docker Compose | Hỗ trợ 100% **Dokploy Application Mode** (không cần docker-compose). |
 
 ## ✨ Key Features
 
-- **Multi-Agent AI**: Built-in support for single agents, RAG agents, and multi-agent teams directly within the backend.
-- **Security First**: Global rate limiting, explicit CORS, Pydantic settings management.
-- **Dokploy Ready**: The backend and web app have their own `Dockerfile` with multi-stage builds. No `docker-compose` needed in production.
-- **Developer Experience**:
-  - `make` commands for everything (Windows users must use Git Bash/WSL).
-  - Pre-configured `pytest`, `ruff`, `oxlint`.
-- **Hackathon-Ready Core Services**:
-  - **S3/MinIO File Uploads**: Pre-configured `boto3` client to handle file uploads via `POST /api/v1/upload/`.
-  - **Background Tasks**: Native FastAPI BackgroundTasks endpoint to run long-running AI tasks without blocking (`POST /api/v1/tasks/run`).
-  - **WebSockets**: Pre-built backend WebSocket router (`/api/v1/ws/chat`) and a frontend `useWebSocket.ts` hook for realtime streaming.
-  - **Dashboard Layout**: A ready-to-use Shadcn `DashboardLayout` for the frontend.
+- **Multi-Agent AI Ready**: Built-in support for single agents, RAG agents, and multi-agent teams using `agno` directly within the backend.
+- **Security First**: Global rate limiting (SlowAPI), explicit CORS, and secret scanning.
+- **Developer Experience (DX)**:
+  - 1-click `make` commands for everything.
+  - Pre-configured `pytest`, `ruff` (Python), and `oxlint` (Frontend).
+- **Core Services Included**:
+  - **File Uploads**: Pre-configured `boto3` for S3/MinIO.
+  - **Background Tasks**: Native FastAPI endpoint for long-running AI tasks.
+  - **WebSockets**: Pre-built router and `useWebSocket.ts` hook for realtime streaming.
 
-## 🚀 Quickstart
+## 🏗 Kiến Trúc
 
-### Prerequisites
-- Node.js 18+
-- Python 3.12+
-- Docker & Docker Compose
-- Make
+**Modular Monolith** — 2 service deploy riêng qua Dokploy.
 
-### 1. Initial Setup
-Run the setup command to install all npm and pip dependencies across the workspace:
-```bash
-make setup
+```
+personal-template
+├── apps/web/                  # Frontend: Vite + React + TailwindCSS + shadcn/ui
+│
+├── services/backend/          # Backend: FastAPI + SQLAlchemy + Agno
+│   ├── src/api/               # REST API routers
+│   ├── src/core/              # Security, configs, DB session
+│   ├── src/models/            # SQLAlchemy models
+│   └── src/schemas/           # Pydantic validation schemas
+│
+├── packages/shared-types/     # Auto-generated TypeScript types (OpenAPI → TS)
+└── docs/                      # Tài liệu quy trình & kiến trúc
 ```
 
-### 2. Environment Variables
-Copy the `.env.example` to `.env` in the root and in the respective services:
+| Layer | Tech |
+|---|---|
+| Frontend | React 18, Vite, TailwindCSS, shadcn/ui |
+| Backend | Python 3.12, FastAPI, SQLAlchemy 2.0 (async), Pydantic v2 |
+| AI/ML | Agno (agent framework), OpenAI/Anthropic SDKs |
+| Database | PostgreSQL 16 (Dokploy managed) |
+| Deploy | Dokploy Application Mode, Nginx |
+
+## 🚀 Quick Start
+
 ```bash
+# 1. Install all dependencies (npm install at root, pip install for backend)
+make setup
+
+# 2. Configure Environment Variables
 cp .env.example .env
 cp services/backend/.env.example services/backend/.env
-```
 
-### 3. Generate API Client (SDK)
-Whenever you modify the backend API, the frontend Typescript SDK must be regenerated.
-To automate this during development, run the watcher in a separate terminal:
-```bash
-make watch-client
-```
-*(You can also run `make generate-client` manually if needed).*
-
-### 4. Start Development Servers
-You can start everything (Frontend, Backend, Postgres DB) with a single command:
-```bash
+# 3. Start dev servers
 make dev
+# Frontend → http://localhost:5173
+# Backend  → http://localhost:8002
+# API docs → http://localhost:8002/docs
+
+# 4. Database Migrations
+make migrate              # Run migrations
+make migrate-new m="msg"  # Create new migration (Read TEAM_WORKFLOW.md first!)
+
+# 5. API client (auto-gen TypeScript types)
+make generate-client      # One-shot generate
+make watch-client         # Watch mode
 ```
-*(Alternatively, run `make dev-backend` or `make dev-frontend` to start them separately).*
 
-### 5. Database Migrations
-The database is managed by Alembic. To create a new migration after modifying models:
-```bash
-make migrate-new m="add_users_table"
-```
-To apply migrations:
-```bash
-make migrate
-```
+> ⚠️ **Windows Users:** `Makefile` sử dụng Unix commands. Bạn BẮT BUỘC phải dùng **Git Bash** hoặc **WSL**. PowerShell/CMD sẽ gây lỗi.
 
-> **⚠️ Team Workflow & Alembic Conflicts:**
-> With multiple people generating migrations simultaneously, you will encounter `Multiple Head Revisions` errors. 
-> **Rule:** We use a single Remote Database for development. Before running `make migrate-new`, you MUST run `git pull` to fetch the latest migration files from your teammates to prevent conflicts.
+## 🚢 Deployment
 
-### 6. Windows Users Guide
-> **⚠️ Important:** The `Makefile` relies on Unix commands like `lsof` and background processes (`&`). 
-> **You MUST use Git Bash or WSL (Windows Subsystem for Linux)** to run `make dev`, `make stop`, and other commands successfully on Windows. Native Command Prompt or PowerShell will fail.
+Deploy qua **Dokploy Application Mode** — mỗi service là 1 Dokploy Application riêng:
 
-## 🚢 Deployment (Dokploy)
+| Service | Dockerfile | Port |
+|---|---|---|
+| Backend | `services/backend/Dockerfile` | 8002 |
+| Frontend | `apps/web/Dockerfile` | 80 (Nginx) |
+| Database | Dokploy PostgreSQL Service | 5432 |
 
-> **⚠️ Hardware Requirements:**
-> Do not deploy this on a cheap VPS (e.g., 1GB - 2GB RAM). Running the Vite build process alongside FastAPI and PostgreSQL will cause an Out-Of-Memory (OOM) crash.
-> **You MUST rent a VPS with at least 4GB of RAM** to ensure smooth deployments during the Hackathon.
-
-This repository is designed for Dokploy's **Application Mode**.
-1. Create a new Application in Dokploy for each service (e.g., Backend, Web).
-2. Point the Build path to the repo root (`.`) for ALL services (both Web and Backend).
-3. Set the Dockerfile path (`./apps/web/Dockerfile` or `./services/backend/Dockerfile`).
-4. Set Environment Variables in the Dokploy UI.
-5. Deploy!
-
-### ⚡ Auto Deploy (CI/CD)
-To enable automatic deployments when you push to GitHub:
-1. Go to your application in the **Dokploy dashboard** > **General** tab and enable **Auto Deploy**.
-2. Go to the **Deployments** tab and copy the **Webhook URL**.
-3. In your **GitHub Repository**, go to **Settings > Webhooks > Add webhook**.
-4. Paste the URL, set Content-Type to `application/json`, and choose "Just the push event".
-*(Note: We use this native Dokploy webhook instead of GitHub Actions for simplicity during the hackathon).*
+Chi tiết xem tại: [`docs/DOKPLOY_STAGING_SETUP.md`](docs/DOKPLOY_STAGING_SETUP.md)
 
 ## 📚 Documentation Layout
 
-This repository separates documentation to prevent information overload for human developers, while keeping AI agents strictly controlled.
+Tài liệu được phân tách rõ ràng để hỗ trợ cả **Người (Human)** và **Máy (AI Agent)** đọc, định vị ngữ cảnh nhanh nhất.
 
-### 👤 For Human Developers
-**This `README.md` is the only onboarding document you need.** It contains all instructions to install, run, and deploy the template.
-- `docs/ARCHITECTURE.md`: Read this to understand the Application structure (React, FastAPI, DB).
+### Architecture & Infrastructure
 
-### 🤝 Shared (Human & AI)
-Documents that define the system truth.
-- `docs/product/` & `docs/stories/`: Feature requirements and tickets.
-- `docs/decisions/`: Architecture Decision Records (ADRs).
-- `docs/openapi/`, `docs/TEST_MATRIX.md`, `docs/TOOL_REGISTRY.md`
+| Tài liệu | Mô tả |
+|---|---|
+| [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Kiến trúc tổng quan (React, FastAPI, Database schema). |
+| [`DOKPLOY_STAGING_SETUP.md`](docs/DOKPLOY_STAGING_SETUP.md) | Hướng dẫn Deploy lên VPS bằng Dokploy. |
 
-### 🤖 For AI Agents ONLY (Harness Control Layer)
-> **WARNING:** If you are a human developer, **DO NOT** read these. They are strict operating manuals for AI Coding Agents.
-- `docs/HARNESS*.md`, `docs/CONTEXT_RULES.md`, `docs/TRACE_SPEC.md`, `docs/IMPROVEMENT_PROTOCOL.md`
-- `docs/onboarding/`: AI-specific environment setup and tool creation guides.
+### Team & Workflow
+
+| Tài liệu | Mô tả |
+|---|---|
+| [`TEAM_WORKFLOW.md`](docs/TEAM_WORKFLOW.md) | Luồng phối hợp nhóm (Sprint process, Database rules, API mock). |
+| [`SPRINT_ACTIVE.md`](docs/SPRINT_ACTIVE.md) | Bảng Kanban hiện tại của team, chứa các Abstract Guidelines. |
+
+## 🤖 AI Agent Onboarding
+
+Nếu bạn đang sử dụng AI Coding Agent (ví dụ: Antigravity/Cursor/Claude), file `README.md` này cung cấp toàn bộ ngữ cảnh về stack. Hãy yêu cầu AI đọc `TEAM_WORKFLOW.md` và `SPRINT_ACTIVE.md` để hiểu luật phối hợp (như không tự ý gen DB migration) trước khi bắt đầu code!
+
+## 📄 License
+
+MIT

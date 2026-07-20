@@ -27,13 +27,11 @@ jobs:
           python-version: "3.12"
       - name: Install ruff
         run: pip install ruff
-      - name: Lint API service
-        run: ruff check services/api/src/
-      - name: Lint AI service
-        run: ruff check services/ai/src/
+      - name: Lint Backend service
+        run: ruff check services/backend/
 
-  test-api:
-    name: Test API Service
+  test-backend:
+    name: Test Backend Service
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -55,37 +53,17 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        working-directory: services/api
+        working-directory: services/backend
         run: |
           pip install -r requirements.txt
           pip install pytest pytest-asyncio httpx
       - name: Run tests
-        working-directory: services/api
+        working-directory: services/backend
         env:
           POSTGRES_SERVER: localhost
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
-          ENVIRONMENT: test
-        run: pytest -v
-
-  test-ai:
-    name: Test AI Service
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install dependencies
-        working-directory: services/ai
-        run: |
-          pip install -r requirements.txt
-          pip install pytest pytest-asyncio
-      - name: Run tests
-        working-directory: services/ai
-        env:
-          AI_MODEL_PROVIDER: mock
           ENVIRONMENT: test
         run: pytest -v
 
@@ -117,9 +95,5 @@ jobs:
         run: npm ci
       - name: TypeCheck shared packages
         run: npm run typecheck --workspace=packages/shared-types --if-present
-      - name: Build workspace
-        run: npm run build --workspace=apps/workspace
-      - name: Build landing
-        run: npm run build --workspace=apps/landing
-      - name: Build admin
-        run: npm run build --workspace=apps/admin
+      - name: Build web app
+        run: npm run build --workspace=apps/web

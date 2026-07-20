@@ -58,14 +58,14 @@ When certain events happen, **you MUST fetch additional context**:
 | Task touches auth, authorization, or security | Treat as high-risk; review `services/backend/src/api/auth.py` and `ARCHITECTURE.md` carefully. |
 | Task discovers stale docs or repeated friction | Do not fix it silently. Add a new task to `docs/BACKLOG.md` tagged with `[Harness]` or `[Tech Debt]`. |
 
-## Hackathon Team Guidelines
+## Pipeline Team Guidelines
 
-Từ phiên thảo luận chuẩn bị Hackathon, toàn bộ 6 thành viên phải tuân thủ các quy định sinh tử sau để đảm bảo tốc độ:
+Để tránh Blockers, toàn bộ thành viên phải tuân thủ các quy định sinh tử sau:
 
-1. **Quy định Database (Alembic):**
-   - Chúng ta sử dụng **1 Remote Database chung** trong lúc dev. 
-   - **Bắt buộc:** Trước khi chạy lệnh `make migrate-new` để tạo bảng mới, bạn phải thực hiện `git pull` để lấy file migration mới nhất của người khác về, tránh lỗi `Multiple Head Revisions`.
+1. **Quy định Database Skeleton (Alembic):**
+   - Chúng ta sử dụng **1 Remote Database chung** trong lúc dev.
+   - **Bắt buộc:** Chỉ **1 thành viên duy nhất** chịu trách nhiệm dựng Khung Database (Skeleton) đầu tiên và push file migration lên remote. Các thành viên khác tuyệt đối không tự ý tạo bảng mới lúc đầu. Mọi sự thừa/thiếu sẽ thống nhất bổ sung sau để tránh lỗi `Multiple Head Revisions`.
 
-2. **Quy định Đồng bộ API (Frontend - Backend Contract):**
-   - Bất cứ khi nào Backend dev thay đổi endpoint, payload, hoặc response schema: Phải lập tức thông báo trên **kênh Discord của team**.
-   - Frontend dev khi nhận được thông báo phải chạy ngay lệnh `make generate-client` (gọi tới `openapi-ts`) để cập nhật lại SDK, nếu không code Frontend sẽ bị lỗi type.
+2. **Quy định Tầng Mock (API Sync):**
+   - Frontend bắt buộc phải dựng UI bằng **Mock Data** trước để không bị phụ thuộc (decouple).
+   - Chỉ khi API Backend đã hoàn toàn ổn định (stable), Backend thông báo, Frontend mới được chuyển sang gọi API thật bằng cách chạy lệnh `make generate-client` để cập nhật SDK.
